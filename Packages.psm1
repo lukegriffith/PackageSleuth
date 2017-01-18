@@ -28,7 +28,7 @@ class PackagesList {
             $items.$TypeName | ForEach-Object {
                 # Use PSObject constructor to map json object to class.
                 # This is currently erroring <------- !!!!!!!!!
-                New-Object -TypeName $TypeName -ArgumentList $_
+                New-Object -TypeName $TypeName -ArgumentList @($_)
 
             }
         }
@@ -86,7 +86,7 @@ class ChocoPackage : Package {
     }
 
     [void]Download([string]$DownloadLocation){
-        
+
     }
 
 
