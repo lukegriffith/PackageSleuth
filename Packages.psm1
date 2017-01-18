@@ -22,14 +22,12 @@ class PackagesList {
         # length needs to be obtained, as json array does not serialize correctly as list.
         # I need to obtain length, manually extract items and add to list.
 
-        # Look at each list, and convert into that type
+        # Look at each list, and convert into that type.
         $items.PSObject.Properties.Name | ForEach-Object {
             $TypeName = $_
             $items.$TypeName | ForEach-Object {
                 # Use PSObject constructor to map json object to class.
-                # This is currently erroring <------- !!!!!!!!!
                 $this.Packages.Add((New-Object -TypeName $TypeName -ArgumentList ($_)))
-
             }
         }
 
@@ -37,7 +35,7 @@ class PackagesList {
 
     # Constructor accepts FileInfo object, and loads items to packages list.
     PackagesList([System.IO.FileInfo]$Document) {
-
+        # Set document, initialize list and load. 
         $this.Document = $Document
         $this.Packages = [List[Package]]::new()
         $this.Load()
@@ -45,6 +43,12 @@ class PackagesList {
 
 }
 
+<#
+    .Description
+    Package class is the superclass for packages that are added. This scaffolds out basic properties and has placeholders
+    for UpdateRecentVersion() and Download() methods. 
+
+#>
 class Package {
 
     [String]$Name 
