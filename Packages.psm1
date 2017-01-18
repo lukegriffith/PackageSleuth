@@ -12,8 +12,7 @@ class PackagesList {
 
     # Saves changes back to document.
     [void]Save(){
-
-
+        $this.Packages | Convertto-json | Out-File -FilePath $this.Document.FullName
     }
 
     # Loads document items, and adds to list.
@@ -43,4 +42,8 @@ class PackagesList {
 
 class Package {
 
+}
+
+class ChocoPackage { 
+    
 }
