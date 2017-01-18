@@ -16,13 +16,15 @@ Describe "Testing PackagesList class" {
     "FeedPackage" : null
 }
 "@
-    }
+    } -ModuleName Packages
 
     it "Should created PackagesList from mocked document"{
         $PackagesList = [PackagesList]::new($mockedFileInfo)
     }
 
-
+    it "Should contain 1 package" {
+        $PackagesList.Packages.Count | should be 1
+    } 
 
 }
 

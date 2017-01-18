@@ -18,7 +18,7 @@ class PackagesList {
     # Loads document items, and adds to list.
     [void]Load(){
 
-        $items = $this.Document | Get-Content | ConvertFrom-Json
+        $items = Get-Content -Path $this.Document.FullName | ConvertFrom-Json
         # length needs to be obtained, as json array does not serialize correctly as list.
         # I need to obtain length, manually extract items and add to list.
 
