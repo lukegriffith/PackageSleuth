@@ -28,7 +28,7 @@ class PackagesList {
             $items.$TypeName | ForEach-Object {
                 # Use PSObject constructor to map json object to class.
                 # This is currently erroring <------- !!!!!!!!!
-                New-Object -TypeName $TypeName -ArgumentList @($_)
+                $this.Packages.Add((New-Object -TypeName $TypeName -ArgumentList ($_)))
 
             }
         }
@@ -71,7 +71,7 @@ class Package {
         $this.Type = $this.gettype()
     }
 
-    Package([PSCustomObject]$Object){
+    Package([PSCustomObject]$Object) : base(){
         $Object.PSObject.Properties.Name | ForEach-Object {
             $this.$_ = $Object.$_
         }
@@ -82,12 +82,14 @@ class Package {
 class ChocoPackage : Package { 
 
     [void]UpdateRecentVersion(){
-
     }
 
     [void]Download([string]$DownloadLocation){
-
     }
 
+    ChocoPackage([PSCustomObject]$Object) : base([PSCustomObject]$Object){}
+}
 
+class FeedPackage : Package {
+    FeedPackage([PSCustomObject]$Object) : base([PSCustomObject]$Object){}
 }

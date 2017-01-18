@@ -1,19 +1,26 @@
 using Namespace System.IO
 using Module .\Packages.psm1
 
+Import-Module .\Packages.psm1
+
 Describe "Testing PackagesList class" {
 
-    $mockedFileInfo = [FileInfo]::new("C:/Mocked.json")
+    $mockedFileInfo = [FileInfo]::new("/Mocked.json")
     Mock Get-Content {
         return @"
 {
     "ChocoPackage": [
         {
             "Name" : "GoogleChrome",
-            "Version" : null,
+            "CurrentVersion" : null
         }
     ],
-    "FeedPackage" : null
+    "FeedPackage" : [
+        {
+            "Name" : "FireFox",
+            "CurrentVersion" : null
+        }
+    ]
 }
 "@
     } -ModuleName Packages
@@ -22,7 +29,7 @@ Describe "Testing PackagesList class" {
     
 
     it "Should contain 1 package" {
-        $PackagesList.Packages.Count | should be 1
+        $PackagesList.Packages.Count | should be 2
     } 
 
 }
