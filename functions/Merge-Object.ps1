@@ -1,3 +1,5 @@
+using Module ../Packages
+# This is not working on PowerShell Core. On Full PS 5.1 it works. 
 
 
 function Merge-Object {
@@ -26,4 +28,8 @@ function Merge-Object {
 
         return $type
     }
+}
+
+function Test {
+    return [ChocoPackage]::new()
 }
