@@ -3,7 +3,7 @@ using Module .\Packages.psm1
 
 Describe "Testing PackagesList class" {
 
-    $mockedFileInfo = [FileInfo]::new("C:\Mocked.json")
+    $mockedFileInfo = [FileInfo]::new("C:/Mocked.json")
     Mock Get-Content {
         return @"
 {
@@ -18,9 +18,8 @@ Describe "Testing PackagesList class" {
 "@
     } -ModuleName Packages
 
-    it "Should created PackagesList from mocked document"{
-        $PackagesList = [PackagesList]::new($mockedFileInfo)
-    }
+    $PackagesList = [PackagesList]::new($mockedFileInfo)
+    
 
     it "Should contain 1 package" {
         $PackagesList.Packages.Count | should be 1

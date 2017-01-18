@@ -22,12 +22,17 @@ class PackagesList {
         # length needs to be obtained, as json array does not serialize correctly as list.
         # I need to obtain length, manually extract items and add to list.
 
-        $item_count = $items.length
+        # Look at each list, and convert into that type
+        $items.PSObject.Properties.Name | ForEach-Object {
+            $TypeName = $_
+            $items.$TypeName | ForEach-Object {
+                # Use PSObject constructor to map json object to class.
+                # This is currently erroring <------- !!!!!!!!!
+                New-Object -TypeName $TypeName -ArgumentList $_
 
-        For ($i = 0; $i -lt $item_count; $i++) {
-            $Package = [Package]$items.Get($i)
-            $this.Packages.Add($Package)
+            }
         }
+
     }
 
     # Constructor accepts FileInfo object, and loads items to packages list.
@@ -64,6 +69,12 @@ class Package {
 
     Package(){
         $this.Type = $this.gettype()
+    }
+
+    Package([PSCustomObject]$Object){
+        $Object.PSObject.Properties.Name | ForEach-Object {
+            $this.$_ = $Object.$_
+        }
     }
 
 }
