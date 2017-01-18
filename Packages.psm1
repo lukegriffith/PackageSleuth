@@ -42,8 +42,41 @@ class PackagesList {
 
 class Package {
 
+    [String]$Name 
+    # Property used when stored to disk, can identify from superclass.
+    [String]$Type
+    [String]$Reference
+    [String]$CurrentVersion
+    [String]$RecentVersion
+
+    [void]UpdateRecentVersion(){
+
+        # Logic to find recent version
+    }
+
+    [void]UpdateCurrentVersion([string]$version){
+        $this.CurrentVersion = $version
+    }
+
+    [void]Download([String]$DownloadLocation){
+
+    }
+
+    Package(){
+        $this.Type = $this.gettype()
+    }
+
 }
 
-class ChocoPackage { 
-    
+class ChocoPackage : Package { 
+
+    [void]UpdateRecentVersion(){
+
+    }
+
+    [void]Download([string]$DownloadLocation){
+        
+    }
+
+
 }
