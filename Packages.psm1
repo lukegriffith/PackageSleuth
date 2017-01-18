@@ -19,10 +19,9 @@ class PackagesList {
     [void]Load(){
 
         $items = Get-Content -Path $this.Document.FullName | ConvertFrom-Json
-        # length needs to be obtained, as json array does not serialize correctly as list.
-        # I need to obtain length, manually extract items and add to list.
 
         # Look at each list, and convert into that type.
+        <#
         $items.PSObject.Properties.Name | ForEach-Object {
             $TypeName = $_
             $items.$TypeName | ForEach-Object {
@@ -30,6 +29,20 @@ class PackagesList {
                 $this.Packages.Add((New-Object -TypeName $TypeName -ArgumentList ($_)))
             }
         }
+        #>
+
+        # Tests need to ensure function works <-------- !!!!
+        $items.PSObject.Properties.Name | ForEach-Object {
+            $Typename = $_
+
+            $items.$TypeName | ForEach-Object {
+                $this.Packages.Add(
+                    (Merge-Object -PSCustomObject $_ -ExpectedType $TypeName)
+                )
+            }
+            
+        }
+
 
     }
 
@@ -75,25 +88,23 @@ class Package {
         $this.Type = $this.gettype()
     }
 
+<#
     Package([PSCustomObject]$Object) : base(){
         $Object.PSObject.Properties.Name | ForEach-Object {
             $this.$_ = $Object.$_
         }
     }
 
+#>
 }
 
 class ChocoPackage : Package { 
 
     [void]UpdateRecentVersion(){
     }
-
     [void]Download([string]$DownloadLocation){
     }
-
-    ChocoPackage([PSCustomObject]$Object) : base([PSCustomObject]$Object){}
 }
 
 class FeedPackage : Package {
-    FeedPackage([PSCustomObject]$Object) : base([PSCustomObject]$Object){}
 }

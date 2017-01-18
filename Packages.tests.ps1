@@ -1,7 +1,7 @@
 using Namespace System.IO
 using Module .\Packages.psm1
 
-Import-Module .\Packages.psm1
+Import-Module .\AutoDownloader.psm1
 
 Describe "Testing PackagesList class" {
 
