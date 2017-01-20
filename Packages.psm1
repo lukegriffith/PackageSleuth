@@ -89,9 +89,7 @@ class NugetPackage : Package {
             throw "Unable to obtain recent version from $($this.Provider), for $($this.Name)"
         }
 
-        $this.RecentVersion = [version]::TryParse($recentVersion)
-
-
+        [version]::TryParse($recentVersion, $this.RecentVersion)
     }
 
     [void]UpdateCurrentVersion(){
