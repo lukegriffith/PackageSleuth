@@ -66,11 +66,6 @@ class Package {
 
     }
 
-    Package(){
-        $this.Type = $this.gettype()
-    }
-
-
 }
 
 class ChocoPackage : Package { 
