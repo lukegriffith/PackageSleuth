@@ -13,8 +13,5 @@ function Read-NuGetOdataFeed {
 
 }
 
-function Invoke-PackageDownload {
-
 
     
-}​
