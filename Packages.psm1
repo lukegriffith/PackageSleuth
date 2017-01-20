@@ -1,6 +1,12 @@
 using namespace System.Collections.Generic
 using module .\Metadata.psm1
 
+enum DownloadType {
+    Recent 
+    Current
+}
+
+
 <#
     .Description
     PackagesList is a collection of all packages configured for the auto downloader.
@@ -43,6 +49,8 @@ class PackagesList {
 
 }
 
+
+
 <#
     .Description
     Package class is the superclass for packages that are added. This scaffolds out basic properties and has placeholders
@@ -62,7 +70,7 @@ class Package {
         $this.CurrentVersion = $version
     }
 
-    [void]Download([String]$DownloadLocation){
+    [void]Download([DownloadType]$Type){
 
     }
 
@@ -72,7 +80,7 @@ class ChocoPackage : Package {
 
     [void]UpdateRecentVersion(){
     }
-    [void]Download([string]$DownloadLocation){
+    [void]Download([DownloadType]$Type){
     }
 }
 
@@ -111,12 +119,18 @@ class NugetPackage : Package {
        
     }
 
-    [void]Download(){
+    [void]Download([DownloadType]$Type){
 
         $downloadLoc = [ModuleMetadata]::DownloadLocation
 
+        $version = $this.RecentVersion
+
+        if ($Type -eq [DownloadType]::Current){
+            $version = $this.CurrentVersion
+        }
+        
         $package = Read-NuGetPackageData -Provider $this.Provider -PackageID $this.Name `
-            -PackageVersion $this.CurrentVersion | Invoke-PackageDownload -downloadPath $downloadLoc
+            -PackageVersion $version | Invoke-PackageDownload -downloadPath $downloadLoc
 
         $urls = Find-BinaryUrlFromNupkg -nupkg $package.fullname
 

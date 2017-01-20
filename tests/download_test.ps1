@@ -10,14 +10,20 @@ $config.NugetPackages | ForEach-Object {
 
     $Package.UpdateRecentVersion()
 
-    try {
-        $Package.UpdateCurrentVersion()
-    }
-    catch {
-        Write-Warning "New version not found"
+    if ($Package.RecentVersion -gt $Package.CurrentVersion) {
+        
+        try {
+            $Package.download([DownloadType]::Recent)
+            $Package.UpdateCurrentVersion()
+        }
+        catch {
+            Write-Error "Failed to download."
+        }
+
     }
 
-    $Package.download()
+
+    
 
 
 
