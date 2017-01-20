@@ -21,7 +21,7 @@ function Find-BinaryUrlFromNupkg {
 
     Begin {
 
-        $extractPath = [Metadata]::CacheLocation
+        $extractPath = [ModuleMetadata]::CacheLocation
 
         if (-not $extractPath) {
             New-Item -ItemType Directory -Path $extractPath
@@ -110,6 +110,11 @@ function ParseScriptForUrl {
 
             $Found = $true
 
+            switch -exact ($_.Extent){
+                "-Url" { $UrlType = "Url"}
+                "-Url64bit" { $UrlType = "Url64"}
+            }
+
             # Obtain index of url/url64bit parameters name
             $index = $Function.CommandElements.IndexOf($_) 
 
@@ -119,11 +124,14 @@ function ParseScriptForUrl {
             # If parameter is a VariableExpressionAST, variables needs to be parsed.
             if ($URL -is [System.Management.Automation.Language.VariableExpressionAst]) {
                 # Variable needs to be parsed
-                $urls += ParseVariable -Ast $allVar -varPath $URL.VariablePath.UserPath
+                $urls += [pscustomobject]@{
+                    Url = (ParseVariable -Ast $allVar -varPath $URL.VariablePath.UserPath);
+                    Type = $UrlType
+                }
             }
             else {
                 # URL found.
-                $urls += $URL.Value
+                $urls += [pscustomobject]@{ Url = $URL.Value; Type = $UrlType }
             }
 
         } -End {
@@ -153,19 +161,26 @@ function ParseScriptForUrl {
                     # if begins with dollar, means it is a variable and we need to find the variable
                     if ($url -and $url -is [System.Management.Automation.Language.VariableExpressionAst]) {
 
-                        $urls += ParseVariable -Ast $allVar -varPath $url.VariablePath
+                        $urls += [pscustomobject]@{
+                            Url = (ParseVariable -Ast $allVar -varPath $url.VariablePath);
+                            Type = "Url"
+                        }
                     }
                     else {
-                        $urls += $url.value
+                        $urls += [pscustomobject]@{Url = $url.value; Type = "Url" }
                     }
 
                     if ($url64bit -and $url64bit -is [System.Management.Automation.Language.VariableExpressionAst]) {
 
-                        $urls +=ParseVariable -Ast $allVar -varPath $url64bit.VariablePath
+                        $urls += [pscustomobject]@{ 
+                            Url = (ParseVariable -Ast $allVar -varPath $url64bit.VariablePath)
+                            Type = "Url64"
+                        }
                     }
                     else {
-                        $urls += $url64bit.value
+                        $urls += [pscustomobject]@{ Url = $url64bit.value; Type = "Url64" } 
                     }
+                    
 
 
                 }

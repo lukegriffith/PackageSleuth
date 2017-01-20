@@ -1,5 +1,5 @@
 using namespace System.Collections.Generic
-using module ..\Metadata.psm1
+using module .\Metadata.psm1
 
 <#
     .Description
@@ -112,10 +112,18 @@ class NugetPackage : Package {
 
     [void]Download([string]$DownloadLocation){
 
-        $downloadLoc = 
+        $downloadLoc = [ModuleMetadata]::DownloadLocation
 
-        Read-NuGetPackageData -Provider $this.Provider -PackageID $this.Name `
-            -PackageVersion $this.CurrentVersion | Invoke-PackageDownload -downloadPath 
+        $package = Read-NuGetPackageData -Provider $this.Provider -PackageID $this.Name `
+            -PackageVersion $this.CurrentVersion | Invoke-PackageDownload -downloadPath $downloadLoc
+
+        $urls = Find-BinaryUrlFromNupkg -nupkg $package.fullname
+
+        if (-not $urls) {
+            throw "Unable to obtain binary URL's from nupkg"
+        }
+
+        $urls | Invoke-BinaryDownload -DownloadPath $downloadLoc -Package $this
 
     }
 }

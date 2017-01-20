@@ -38,6 +38,7 @@ function Invoke-PackageDownload {
         $url = $FeedItem.content.src
         $destination = ($FeedItem.title.'#text' + "." + $FeedItem.properties.Version)
         Invoke-WebRequest -Uri $url -OutFile "$DownloadPath/$destination.zip"
+        Get-Item  -Path "$DownloadPath/$destination.zip"
     }
 
 }
