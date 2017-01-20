@@ -30,11 +30,11 @@ function Find-BinaryUrlFromNupkg {
         )
     }
 
-    $nupkg = Get-Item -Path $nupkg
-    $baseName = $nupkg.baseName
+    $nupkgItem = Get-Item -Path $nupkg
+    $baseName = $nupkgItem.baseName
     $extractPath = "$extractPath\$basename"
 
-    Expand-Archive -Path $nupkg.fullname -DestinationPath $extractPath
+    Expand-Archive -Path $nupkgItem.fullname -DestinationPath $extractPath
 
     $InstallScript = Get-ChildItem $extractPath -Filter "ChocolateyInstall.ps1" -Recurse
 
