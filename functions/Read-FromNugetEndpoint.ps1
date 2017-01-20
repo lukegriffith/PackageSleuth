@@ -1,3 +1,5 @@
+
+
 <#
 
     .Description
@@ -47,7 +49,7 @@ function invoke-packagedownload {
     Read-NuGetPackageVersions -PackageID GoogleChrome
 
 #>
-function Read-NuGetPackageVersions {
+function Read-NuGetPackageVersion {
     param(
         $provider = "chocolatey.org",
         $PackageID
