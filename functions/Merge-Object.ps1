@@ -1,4 +1,4 @@
-using module ../Packages.psm1
+using module ..\Packages.psm1
 # This is not working on PowerShell Core. On Full PS 5.1 it works. 
 
 

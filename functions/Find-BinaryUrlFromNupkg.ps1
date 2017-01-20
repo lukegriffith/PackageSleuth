@@ -19,26 +19,38 @@ function Find-BinaryUrlFromNupkg {
         [String]$nupkg
     )
 
-    $extractPath = [Metadata]::CacheLocation
+    Begin {
 
-    if (-not (test-path $nupkg)) {
-        $PSCmdlet.ThrowTerminatingError(
-            [System.Management.Automation.ErrorRecord]::new(
-                [System.Exception]::new("Unable to locate .nupkg."),
-                5001
-            )
-        )
+        $extractPath = [Metadata]::CacheLocation
+
+        if (-not $extractPath) {
+            New-Item -ItemType Directory -Path $extractPath
+        }
+
+        if (-not (test-path $nupkg)) {
+            Throw "Unable to locate nupkg."
+        }
     }
 
-    $nupkgItem = Get-Item -Path $nupkg
-    $baseName = $nupkgItem.baseName
-    $extractPath = "$extractPath\$basename"
+    Process {
 
-    Expand-Archive -Path $nupkgItem.fullname -DestinationPath $extractPath
 
-    $InstallScript = Get-ChildItem $extractPath -Filter "ChocolateyInstall.ps1" -Recurse
+        $nupkgItem = Get-Item -Path $nupkg
+        $baseName = $nupkgItem.baseName
+        $UncompressedArchive = "$extractPath\$baseName"
 
-    ParseScriptForUrl -ScriptFile $InstallScript.FullName
+        Expand-Archive -Path $nupkgItem.fullname -DestinationPath $UncompressedArchive
+
+        $InstallScript = Get-ChildItem $UncompressedArchive -Filter "ChocolateyInstall.ps1" -Recurse
+
+        ParseScriptForUrl -ScriptFile $InstallScript.FullName
+
+    }
+
+    End {
+
+        Remove-Item $extractPath -force -Recurse
+    }
 
 
 }
