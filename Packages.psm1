@@ -50,6 +50,8 @@ class PackagesList {
             $Typename = $_
 
             $items.$TypeName | ForEach-Object {
+
+                $obj = $_
                 $this.Packages.Add(
                     (Merge-Object -PSCustomObject $_ -ExpectedType $TypeName)
                 )
@@ -123,7 +125,7 @@ class NugetPackage : Package {
 
         # Set recent version
         if ($version -ne [version]"0.0.0.0") {
-            $this.RecentVersion = $version.tostring()
+            $this.RecentVersion = $recentVersion
         }
     }
 
