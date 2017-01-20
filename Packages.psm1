@@ -85,11 +85,19 @@ class NugetPackage : Package {
         $recentVersion = Read-NuGetPackageVersion -Provider $this.Provider -PackageID $this.Name |
             Sort-Object -Descending | Select-Object -First 1
 
+        # Throw if version cannot be determined.
         if (-not $recentVersion) {
             throw "Unable to obtain recent version from $($this.Provider), for $($this.Name)"
         }
 
-        [version]::TryParse($recentVersion, [ref]$this.RecentVersion)
+        # Attempt version parse
+        [version]$version = "0.0.0.0"
+        [version]::TryParse($recentVersion, [ref]$version)
+
+        # Set recent version
+        if ($version -ne [version]"0.0.0.0") {
+            $this.RecentVersion = $version
+        }
     }
 
     [void]UpdateCurrentVersion(){
