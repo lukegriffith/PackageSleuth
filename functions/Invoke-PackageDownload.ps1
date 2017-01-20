@@ -18,6 +18,8 @@ function Update-RecentVersion {
 
     Process {
 
+        Write-Verbose "Updating version for $($Package.Name)"
+
         try {
             $Package.UpdateRecentVersion()
         }
@@ -37,14 +39,32 @@ function Sync-Packages {
 
     Process {
 
-        try {
-            $Package.Download()
-            $Package.UpdateCurrentVersion()
+        Write-Verbose "Starting sync for $($Package.Name)"
+
+        if ([Version]$Package.CurrentVersion -lt [Version]$Package.RecentVersion) {
+
+            Write-Verbose "Initiating download for $($Package.Name)"
+            try {
+                $Package.Download()
+
+                Write-Verbose "Download completed for $($Package.Name)"
+
+                $Package.UpdateCurrentVersion()
+
+                Write-Verbose "Version updated for $($Package.Name)"
+            }
+            catch {
+
+                Write-Warning "Unable to download package for $($Package.Name)"
+
+            }
+
         }
-        catch {
-            Write-Warning "Unable to download package for $($Package.Name)"
+        else {
+
         }
 
         Write-Output $Package
+
     }
 }

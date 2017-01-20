@@ -4,6 +4,9 @@
 
 #>
 function Invoke-AutoDownload {
+    param(
+        [switch]$disableExport
+    )
     
     Write-Verbose "Initiating package autodownload."
 
@@ -13,13 +16,14 @@ function Invoke-AutoDownload {
 
     Write-Verbose "Starting update workflow."
 
-    Get-PackagesList | Update-RecentVersion | Where-Object {
-        -not $_.CurrentVersion -or ([Version]$_.RecentVersion -gt [Version]$_.CurrentVersion)
-        } | Sync-Packages
+    Get-PackageList | Update-RecentVersion |  Sync-Packages
 
-    Write-Verbose "Writing updates to datastore."
+    if (-not $disableExport.Present) {
+        Write-Verbose "Writing updates to datastore."
+        Write-PackageList
+    }
 
-    Write-PackageList
+    
 
     Write-Verbose "Finish."
 

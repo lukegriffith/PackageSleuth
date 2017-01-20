@@ -8,7 +8,7 @@ using module ..\Packages.psm1
     PS> Get-PackagesList
 
 #>
-function Get-PackagesList {
+function Get-PackageList {
 
     $pkgs = [PackagesList]::GetInstance().Packages
 
