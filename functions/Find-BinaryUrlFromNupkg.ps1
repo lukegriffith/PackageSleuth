@@ -1,21 +1,74 @@
+using module ..\Metadata.psm1
 
-function ParseVariable {
+<#
+    .synopsis
+    Find-BinaryURLFromNupkg obtains the download URL provided in the package. 
+
+    .description
+    Ties together a number of cmdlets that extract a local nupkg, and attmepts to locate the definition of the url / url64bit paramter provided 
+    to the Install-Chocolatey* cmdlets. This will return an array of URL's.
+
+    .notes
+    Author: Luke Griffith
+    Date: 20/01/17
+
+#>
+function Find-BinaryUrlFromNupkg {
+    [cmdletbinding()]
     param(
-        $ast,
-        $varPath
+        [String]$nupkg
     )
 
+    $extractPath = [Metadata]::CacheLocation
 
+    if (-not (test-path $nupkg)) {
+        $PSCmdlet.ThrowTerminatingError(
+            [System.Management.Automation.ErrorRecord]::new(
+                [System.Exception]::new("Unable to locate .nupkg."),
+                5001
+            )
+        )
+    }
 
-    $Variable = $ast | Where-Object {$_.VariablePath.UserPath -eq $varPath -and  $_.Parent.Operator -eq "Equals"}
+    $nupkg = Get-Item -Path $nupkg
+    $baseName = $nupkg.baseName
+    $extractPath = "$extractPath\$basename"
 
-    $Variable.parent.right.expression.value
+    Expand-Archive -Path $nupkg.fullname -DestinationPath $extractPath
+
+    $InstallScript = Get-ChildItem $extractPath -Filter "ChocolateyInstall.ps1" -Recurse
+
+    ParseScriptForUrl -ScriptFile $InstallScript.FullName
 
 
 }
 
 
+<#
+    .Description
+    Takes a AST object, and attempts to obtain the root variable of the given variable path. 
 
+#>
+function ParseVariable {
+    param(
+        $ast,
+        $varPath
+    )
+    
+    $variable = $ast | Where-Object {$_.VariablePath.UserPath -eq $varPath -and  $_.Parent.Operator -eq "Equals"}
+    return $variable.parent.right.expression.value
+}
+
+
+<#
+    .Description
+    Given a PS1 script, it will inspect the syntax tree and attempt to pull out the URL or URL64BIT url provided to the 
+    Install-Chocolatey* cmdlet. 
+
+    .Notes
+    I've tried to comment as much as possible as the AST stuff gets complicated real fast. 
+
+#>
 function ParseScriptForUrl {
 
     param(
@@ -114,12 +167,3 @@ function ParseScriptForUrl {
 
 }
 
-
-function Find-BinaryUrlFromNupkg {
-
-    param(
-        [String]$nupkg
-    )
-
-
-}
