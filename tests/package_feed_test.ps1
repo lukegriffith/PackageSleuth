@@ -1,17 +1,17 @@
 ﻿using module ..\Packages.psm1
 using module ..\..\AutoDownloader
 
+$doc = Get-Item ..\PackagesConfig.json
 
-$config = Get-Content $PSScriptRoot\..\PackagesConfig.json | ConvertFrom-Json
+$PackageList = [PackagesList]::new($doc)
 
-$config.NugetPackages | ForEach-Object {
+$PackageList.Packages | ForEach-Object { 
 
     [NuGetPackage]$Package = $_ 
 
     $Package.UpdateRecentVersion()
 
-    if ([version]$Package.RecentVersion -gt [version]$Package.CurrentVersion) {
-        
+    if ($Package.RecentVersion -gt $Package.CurrentVersion) {
         try {
             $Package.download([DownloadType]::Recent)
             $Package.UpdateCurrentVersion()
@@ -19,16 +19,7 @@ $config.NugetPackages | ForEach-Object {
         catch {
             Write-Error "Failed to download."
         }
-
     }
-
-
-    
-
-
-
 }
 
-
-
-
+$PackageList.Save()

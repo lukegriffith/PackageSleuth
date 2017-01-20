@@ -19,7 +19,26 @@ class PackagesList {
 
     # Saves changes back to document.
     [void]Save(){
-        $this.Packages | Convertto-json | Out-File -FilePath $this.Document.FullName
+    
+        $obj = [PSCustomObject]@{}
+
+        # Determining types of objects to build JSON config list.
+        $groupedTypes = $this.Packages | Select-Object @{name="Type";expression={$_.GetType().Name}} | 
+            Group-Object -Property Type
+
+        # Initializing packages list for each type.
+        $groupedTypes | ForEach-Object -Process {
+            $obj | Add-Member -Name $_.Name -Value ([List[Package]]::new()) -MemberType NoteProperty
+        }
+
+        # Appending packages to the correct list.
+        $this.Packages | ForEach-Object { 
+            $Type = $_.GetType().Name
+            $obj.$Type.Add($_)
+        }
+
+        # Export packages
+        $obj | Convertto-json | Out-File -FilePath $this.Document.FullName
     }
 
     # Loads document items, and adds to list.
@@ -62,11 +81,11 @@ class Package {
     [String]$Name 
     # Property used when stored to disk, can identify from superclass.
     [String]$Reference
-    [Version]$CurrentVersion
-    [Version]$RecentVersion
+    [String]$CurrentVersion
+    [String]$RecentVersion
 
 
-    [void]UpdateCurrentVersion([Version]$version){
+    [void]UpdateCurrentVersion([String]$version){
         $this.CurrentVersion = $version
     }
 
@@ -104,7 +123,7 @@ class NugetPackage : Package {
 
         # Set recent version
         if ($version -ne [version]"0.0.0.0") {
-            $this.RecentVersion = $version
+            $this.RecentVersion = $version.tostring()
         }
     }
 
@@ -128,7 +147,7 @@ class NugetPackage : Package {
         if ($Type -eq [DownloadType]::Current){
             $version = $this.CurrentVersion
         }
-        
+
         $package = Read-NuGetPackageData -Provider $this.Provider -PackageID $this.Name `
             -PackageVersion $version | Invoke-PackageDownload -downloadPath $downloadLoc
 
