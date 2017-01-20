@@ -82,8 +82,8 @@ class NugetPackage : Package {
 
     [void]UpdateRecentVersion(){
         
-        $recentVersion = Read-NuGetPackageVersion -Provider $this.Provider -PackageID $this.Name |
-            Sort-Object -Descending | Select-Object -First 1
+        $versionList = Read-NuGetPackageVersion -Provider $this.Provider -PackageID $this.Name 
+        $recentVersion = $versionList | Sort-Object -Descending | Select-Object -First 1
 
         # Throw if version cannot be determined.
         if (-not $recentVersion) {
@@ -111,7 +111,7 @@ class NugetPackage : Package {
        
     }
 
-    [void]Download([string]$DownloadLocation){
+    [void]Download(){
 
         $downloadLoc = [ModuleMetadata]::DownloadLocation
 

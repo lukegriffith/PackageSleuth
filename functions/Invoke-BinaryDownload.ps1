@@ -10,13 +10,14 @@ using module ..\Packages.psm1
 function Invoke-BinaryDownload {
     param(
         [Parameter(ValueFromPipeline=$true)]
-        [string]$Url,
+        [PSCustomObject]$Url,
         [string]$DownloadPath,
         [Package]$Package
     )
 
     Process {
-        $uri = [uri]::TryCreate($url)
+
+        [uri]$uri = $Url.url
         [fileinfo]$file = $uri.segments[-1]
 
         if ($file.Extension -notin @('.exe','.msi','.msu')){
@@ -28,8 +29,8 @@ function Invoke-BinaryDownload {
         }
 
         $FilePath = "$DownloadPath\{0}-{1}{2}.{3}{4}" -f $Package.Reference, $Package.Name, $64Bit,
-            $Package.Version, $file.Extension
+            $Package.CurrentVersion, $file.Extension
 
-        Invoke-WebRequest -Uri $url -OutFile $FilePath
+        Invoke-WebRequest -Uri $url.url -OutFile $FilePath
     }
 }
