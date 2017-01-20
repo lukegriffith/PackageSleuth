@@ -1,7 +1,7 @@
 ﻿using module ..\Packages.psm1
 using module ..\..\AutoDownloader
 
-$doc = Get-Item ..\PackagesConfig.json
+$doc = Get-Item $PSScriptRoot\..\PackagesConfig.json
 
 $PackageList = [PackagesList]::new($doc)
 

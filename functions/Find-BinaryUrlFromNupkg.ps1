@@ -190,6 +190,37 @@ function ParseScriptForUrl {
     }
 
 
+    if ($urls.Count -eq 0) {
+
+        $urlVariable = $allVar | Where-Object {$_.VariablePath.UserPath -like "*url*"} | ForEach-Object -Process {
+
+            $variable = $_ | Where-Object {$_.Parent.Operator -eq "Equals"}
+
+            if ($variable) { 
+
+                $variablel.VariablePath.UserPath -match "(32|64)"
+
+                if ($Matches.1 -eq "32") {
+                    $UrlType = $url
+                }
+                elseif ($Matches.1 -eq "64") {
+
+                    $UrlType = "Url64"
+                }
+
+                $urls += [pscustomobject]@{
+                    Url = ($variable.parent.right.expression.value);
+                    Type = $UrlType
+                }
+
+            }
+
+        }
+
+
+    }
+
+
     Write-Output $urls
 
 }

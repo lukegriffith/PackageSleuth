@@ -15,7 +15,10 @@ enum DownloadType {
 class PackagesList {
 
     [List[Package]]$Packages
+    
     hidden [System.IO.FileInfo]$Document
+
+    static hidden [PackagesList]$Instance
 
     # Saves changes back to document.
     [void]Save(){
@@ -59,6 +62,20 @@ class PackagesList {
             
         }
     }
+    
+    static [PackagesList]GetInstance() {
+
+        if (-not [PackagesList]::Instance) {
+            throw "No instance found"
+        }
+
+        return [PackagesList]::Instance
+    }
+
+    static [void]SetInstance([PackagesList]$List) {
+        [PackagesList]::Instance = $List
+    }
+
 
     # Constructor accepts FileInfo object, and loads items to packages list.
     PackagesList([System.IO.FileInfo]$Document) {
@@ -112,7 +129,7 @@ class NugetPackage : Package {
     [void]UpdateRecentVersion(){
         
         $versionList = Read-NuGetPackageVersion -Provider $this.Provider -PackageID $this.Name 
-        $recentVersion = $versionList | Sort-Object -Descending | Select-Object -First 1
+        $recentVersion = $versionList| Select-Object -Last 1
 
         # Throw if version cannot be determined.
         if (-not $recentVersion) {
