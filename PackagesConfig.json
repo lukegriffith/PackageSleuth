@@ -1,0 +1,10 @@
+{
+    "NugetPackages":[
+        {
+            "Name":"GoogleChrome",
+            "Reference":"TempRef",
+            "CurrentVersion":"10.0.0",
+            "Provider":"www.chocolatey.org"
+        }
+    ]
+}

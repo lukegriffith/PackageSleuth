@@ -1,4 +1,5 @@
 using namespace System.Collections.Generic
+using module ..\Metadata.psm1
 
 <#
     .Description
@@ -20,18 +21,6 @@ class PackagesList {
 
         $items = Get-Content -Path $this.Document.FullName | ConvertFrom-Json
 
-        # Look at each list, and convert into that type.
-        <#
-        $items.PSObject.Properties.Name | ForEach-Object {
-            $TypeName = $_
-            $items.$TypeName | ForEach-Object {
-                # Use PSObject constructor to map json object to class.
-                $this.Packages.Add((New-Object -TypeName $TypeName -ArgumentList ($_)))
-            }
-        }
-        #>
-
-        # Tests need to ensure function works <-------- !!!!
         $items.PSObject.Properties.Name | ForEach-Object {
             $Typename = $_
 
@@ -42,8 +31,6 @@ class PackagesList {
             }
             
         }
-
-
     }
 
     # Constructor accepts FileInfo object, and loads items to packages list.
@@ -66,17 +53,12 @@ class Package {
 
     [String]$Name 
     # Property used when stored to disk, can identify from superclass.
-    [String]$Type
     [String]$Reference
-    [String]$CurrentVersion
-    [String]$RecentVersion
+    [Version]$CurrentVersion
+    [Version]$RecentVersion
 
-    [void]UpdateRecentVersion(){
 
-        # Logic to find recent version
-    }
-
-    [void]UpdateCurrentVersion([string]$version){
+    [void]UpdateCurrentVersion([Version]$version){
         $this.CurrentVersion = $version
     }
 
@@ -88,14 +70,7 @@ class Package {
         $this.Type = $this.gettype()
     }
 
-<#
-    Package([PSCustomObject]$Object) : base(){
-        $Object.PSObject.Properties.Name | ForEach-Object {
-            $this.$_ = $Object.$_
-        }
-    }
 
-#>
 }
 
 class ChocoPackage : Package { 
@@ -106,5 +81,41 @@ class ChocoPackage : Package {
     }
 }
 
-class FeedPackage : Package {
+class NugetPackage : Package {
+
+    [String]$Provider
+
+    [void]UpdateRecentVersion(){
+        
+        $recentVersion = Read-NuGetPackageVersion -Provider $this.Provider -PackageID $this.Name |
+            Sort-Object -Descending | Select-Object -First 1
+
+        if (-not $recentVersion) {
+            throw "Unable to obtain recent version from $($this.Provider), for $($this.Name)"
+        }
+
+        $this.RecentVersion = $recentVersion
+
+
+    }
+
+    [void]UpdateCurrentVersion(){
+        
+        if ($this.RecentVersion){
+            $this.CurrentVersion = $this.RecentVersion
+        }
+        else {
+            throw "No recent version set, to update current."
+        }
+       
+    }
+
+    [void]Download([string]$DownloadLocation){
+
+        $downloadLoc = 
+
+        Read-NuGetPackageData -Provider $this.Provider -PackageID $this.Name `
+            -PackageVersion $this.CurrentVersion | Invoke-PackageDownload -downloadPath 
+
+    }
 }

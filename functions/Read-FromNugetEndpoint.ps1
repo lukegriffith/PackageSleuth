@@ -9,7 +9,7 @@
 #>
 function Read-NuGetPackageData {
     param(
-        $provider = "chocolatey.org",
+        $Provider = "chocolatey.org",
         [Parameter(Mandatory=$true)]
         $PackageID,
         [Parameter(Mandatory=$true)]
@@ -26,7 +26,7 @@ function Read-NuGetPackageData {
 
 }
 
-function invoke-packagedownload { 
+function Invoke-PackageDownload { 
     param(
         [parameter(ValueFromPipeline=$true)]
         $feedItem,
@@ -51,7 +51,7 @@ function invoke-packagedownload {
 #>
 function Read-NuGetPackageVersion {
     param(
-        $provider = "chocolatey.org",
+        $Provider = "chocolatey.org",
         $PackageID
     )
 
