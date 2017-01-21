@@ -23,8 +23,6 @@ function Invoke-AutoDownload {
         Write-PackageList
     }
 
-    
-
     Write-Verbose "Finish."
 
 }
