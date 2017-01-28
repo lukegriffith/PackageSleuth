@@ -56,6 +56,7 @@ function Sync-Packages {
             catch {
 
                 Write-Warning "Unable to download package for $($Package.Name)"
+                Write-Error $_
 
             }
 
