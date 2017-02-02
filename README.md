@@ -1,4 +1,4 @@
-# AutoDownloader (Working Title)
+# PackageSleuth
 
 ## Setup
 Using the PackageConfig.json file you can configure what you want to automatically download
