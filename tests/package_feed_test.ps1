@@ -14,7 +14,7 @@ $PackageList.Packages | ForEach-Object {
     if ($Package.RecentVersion -gt $Package.CurrentVersion) {
         try {
             $Package.download([DownloadType]::Recent)
-            $Package.UpdateCurrentVersion()
+            $Package.UpdateVersion()
         }
         catch {
             Write-Error "Failed to download."

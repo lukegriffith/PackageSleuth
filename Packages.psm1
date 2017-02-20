@@ -1,4 +1,5 @@
 using namespace System.Collections.Generic
+using module PackageManagement
 using module .\Metadata.psm1
 
 enum DownloadType {
@@ -8,7 +9,7 @@ enum DownloadType {
 
 
 <#
-    .Description
+    .DESCRIPTION
     PackagesList is a collection of all packages configured for the auto downloader.
     This contains the methods to load and save any changes back to the document. 
 #>
@@ -90,7 +91,7 @@ class PackagesList {
 
 
 <#
-    .Description
+    .DESCRIPTION
     Package class is the superclass for packages that are added. This scaffolds out basic properties and has placeholders
     for UpdateRecentVersion() and Download() methods. 
 
@@ -100,12 +101,12 @@ class Package {
     [String]$Name 
     # Property used when stored to disk, can identify from superclass.
     [String]$Reference
-    [String]$CurrentVersion
+    [String]$Version
     [String]$RecentVersion
 
 
-    [void]UpdateCurrentVersion([String]$version){
-        $this.CurrentVersion = $version
+    [void]UpdateVersion([String]$version){
+        $this.Version = $version
     }
 
     [void]Download([DownloadType]$Type){
@@ -122,6 +123,44 @@ class ChocoPackage : Package {
     }
 }
 
+class PSGallery : Package { 
+
+    [void]UpdateRecentVersion(){
+        Try {
+            $Module = Find-Module -Name $this.Name
+            $Version = [Version]::Parse($Module.Version)
+
+            If ($Version -ne $this.RecentVersion) {
+                $this.RecentVersion = $Version
+            }
+        }
+        Catch {
+            throw "Unable to obtain recent version for $($this.Name)"
+        }
+    }
+
+    [void]UpdateCurrentVersion(){
+        if ($this.RecentVersion){
+            $this.Version = $this.RecentVersion
+        }
+        else {
+            throw "No recent version set, to update current."
+        }
+    }
+
+    [void]Download(){
+        
+        $downloadLoc = [ModuleMetadata]::DownloadLocation
+        
+        Try {
+            Save-Module -Name $this.Name -Path $downloadLoc
+        }
+        Catch {
+            throw "Unable to download $($this.Name). $($_.Exception.Message)"
+        }
+    }
+}
+
 class NugetPackage : Package {
 
     [String]$Provider
@@ -129,7 +168,7 @@ class NugetPackage : Package {
     [void]UpdateRecentVersion(){
         
         $versionList = Read-NuGetPackageVersion -Provider $this.Provider -PackageID $this.Name 
-        $recentVersion = $versionList| Select-Object -Last 1
+        $recentVersion = $versionList | Select-Object -Last 1
 
         # Throw if version cannot be determined.
         if (-not $recentVersion) {
@@ -146,10 +185,10 @@ class NugetPackage : Package {
         }
     }
 
-    [void]UpdateCurrentVersion(){
+    [void]UpdateVersion(){
         
         if ($this.RecentVersion){
-            $this.CurrentVersion = $this.RecentVersion
+            $this.Version = $this.RecentVersion
         }
         else {
             throw "No recent version set, to update current."
@@ -164,7 +203,7 @@ class NugetPackage : Package {
         $version = $this.RecentVersion
 
         if ($Type -eq [DownloadType]::Current){
-            $version = $this.CurrentVersion
+            $version = $this.Version
         }
 
         $package = Read-NuGetPackageData -Provider $this.Provider -PackageID $this.Name `
