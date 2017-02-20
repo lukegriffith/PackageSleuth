@@ -63,6 +63,10 @@ class PackagesList {
             
         }
     }
+
+    [bool]IsOutdated(){
+        return new-object System.NotImplementedException
+    }
     
     static [PackagesList]GetInstance() {
 
