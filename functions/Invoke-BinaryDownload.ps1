@@ -12,7 +12,8 @@ function Invoke-BinaryDownload {
         [Parameter(ValueFromPipeline=$true)]
         [PSCustomObject]$Url,
         [string]$DownloadPath,
-        [Package]$Package
+        [Package]$Package,
+        [DownloadType]$type
     )
 
     Process {
@@ -28,8 +29,10 @@ function Invoke-BinaryDownload {
             $64Bit = ".x64"
         }
 
+        $versionMap = @{[DownloadType]::Recent = $Package.RecentVersion; [DownloadType]::Current = $Package.CurrentVersion}
+
         $FilePath = "$DownloadPath\{0}-{1}{2}.{3}{4}" -f $Package.Reference, $Package.Name, $64Bit,
-            $Package.CurrentVersion, $file.Extension
+            $versionMap[$type], $file.Extension
 
         Invoke-WebCall -Uri $url.url -OutFile $FilePath
     }

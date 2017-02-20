@@ -221,7 +221,7 @@ class NugetPackage : Package {
             throw "Unable to obtain binary URL's from nupkg"
         }
 
-        $urls | Invoke-BinaryDownload -DownloadPath $downloadLoc -Package $this
+        $urls | Invoke-BinaryDownload -DownloadPath $downloadLoc -Package $this -type $Type
 
     }
 
