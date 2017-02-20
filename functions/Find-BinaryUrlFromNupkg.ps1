@@ -80,6 +80,7 @@ function ParseVariable {
     .Notes
     I've tried to comment as much as possible as the AST stuff gets complicated real fast. 
 
+    This should be depricated, as Chocolatey Business features replace this.
 #>
 function ParseScriptForUrl {
 

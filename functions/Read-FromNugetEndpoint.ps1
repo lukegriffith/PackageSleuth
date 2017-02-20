@@ -21,7 +21,7 @@ function Read-NuGetPackageData {
     write-verbose $urlStem -verbose
     $url = $urlStem -f $url, $PackageID
 
-    Invoke-RestMethod -uri $url 
+    Invoke-WebCall -uri $url 
 
 
 }
@@ -37,7 +37,7 @@ function Invoke-PackageDownload {
     Process {
         $url = $FeedItem.content.src
         $destination = ($FeedItem.title.'#text' + "." + $FeedItem.properties.Version)
-        Invoke-WebRequest -Uri $url -OutFile "$DownloadPath/$destination.zip"
+        Invoke-WebCall -Uri $url -OutFile "$DownloadPath/$destination.zip"
         Get-Item  -Path "$DownloadPath/$destination.zip"
     }
 
@@ -57,7 +57,7 @@ function Read-NuGetPackageVersion {
     )
 
     $url = 'https://{0}/api/v2/package-versions/{1}' -f $provider, $PackageID
-    Invoke-RestMethod -Uri $url 
+    Invoke-WebCall -uri $url 
 
 }
 

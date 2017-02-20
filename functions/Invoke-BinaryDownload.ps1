@@ -31,6 +31,6 @@ function Invoke-BinaryDownload {
         $FilePath = "$DownloadPath\{0}-{1}{2}.{3}{4}" -f $Package.Reference, $Package.Name, $64Bit,
             $Package.CurrentVersion, $file.Extension
 
-        Invoke-WebRequest -Uri $url.url -OutFile $FilePath
+        Invoke-WebCall -Uri $url.url -OutFile $FilePath
     }
 }
