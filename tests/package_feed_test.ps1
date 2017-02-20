@@ -11,7 +11,7 @@ $PackageList.Packages | ForEach-Object {
 
     $Package.UpdateRecentVersion()
 
-    if ($Package.RecentVersion -gt $Package.CurrentVersion) {
+    if ($Package.IsOutdated()) {
         try {
             $Package.download([DownloadType]::Recent)
             $Package.UpdateVersion()

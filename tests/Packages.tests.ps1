@@ -9,13 +9,13 @@ Describe "Testing PackagesList class" {
     Mock Get-Content {
         return @"
 {
-    "ChocoPackage": [
+    "NugetPackage": [
         {
             "Name" : "GoogleChrome",
             "CurrentVersion" : null
         }
     ],
-    "FeedPackage" : [
+    "PSGallery" : [
         {
             "Name" : "FireFox",
             "CurrentVersion" : null
@@ -32,5 +32,30 @@ Describe "Testing PackagesList class" {
         $PackagesList.Packages.Count | should be 2
     } 
 
+}
+
+Describe "Packages" {
+
+    Context "Testing outdated logic" {
+
+        $package = [Package]::new()
+
+        it "Should return boolean" {
+            $package.IsOutdated() | should BeOfType [bool]
+        }
+
+        $package.Version = "1.0"
+        $package.RecentVersion = "1.1"
+
+        it "Should return true, as recent is higher" {
+            $package.IsOutdated() | should be $true
+        }
+
+        $package.RecentVersion = "1.0"
+        it "Should return false, as recent is same" {
+            $package.IsOutdated() | should be $false
+        }
+
+    }
 }
 

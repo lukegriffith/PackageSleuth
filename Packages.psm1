@@ -64,10 +64,7 @@ class PackagesList {
         }
     }
 
-    [bool]IsOutdated(){
-        return new-object System.NotImplementedException
-    }
-    
+
     static [PackagesList]GetInstance() {
 
         if (-not [PackagesList]::Instance) {
@@ -116,6 +113,11 @@ class Package {
     [void]Download([DownloadType]$Type){
 
     }
+
+    [bool]IsOutdated(){
+        return ([version]$this.RecentVersion -gt [version]$this.Version)
+    }
+    
 
 }
 
@@ -222,4 +224,5 @@ class NugetPackage : Package {
         $urls | Invoke-BinaryDownload -DownloadPath $downloadLoc -Package $this
 
     }
+
 }
